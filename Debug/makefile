@@ -60,8 +60,8 @@ all: main-build
 main-build: JA\ Rocketry\ Altimieter.elf secondary-outputs
 
 # Tool invocations
-JA\ Rocketry\ Altimieter.elf JA\ Rocketry\ Altimieter.map: $(OBJS) $(USER_OBJS) F:\Documents\Github\Altimiter\STM32F030C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "JA Rocketry Altimieter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"F:\Documents\Github\Altimiter\STM32F030C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="JA Rocketry Altimieter.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+JA\ Rocketry\ Altimieter.elf JA\ Rocketry\ Altimieter.map: $(OBJS) $(USER_OBJS) F:\Documents\Github\STM32_Altimeter\STM32F030C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "JA Rocketry Altimieter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"F:\Documents\Github\STM32_Altimeter\STM32F030C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="JA Rocketry Altimieter.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

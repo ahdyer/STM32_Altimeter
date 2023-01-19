@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "gpio_pin_names.h"
 
 /* USER CODE END Includes */
 
@@ -46,6 +47,9 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+struct bmp388_vars {
+
+};
 
 /* USER CODE END PV */
 
