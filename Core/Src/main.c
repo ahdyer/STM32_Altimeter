@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "gpio_pin_names.h"
+#include "bmp388.h"
 
 /* USER CODE END Includes */
 
@@ -50,6 +51,8 @@ UART_HandleTypeDef huart1;
 struct bmp388_vars {
 
 };
+
+struct Coeffs bmp388Coeffs;
 
 /* USER CODE END PV */
 
