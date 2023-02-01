@@ -48,11 +48,10 @@ I2C_HandleTypeDef hi2c1;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-struct bmp388_vars {
 
-};
-
-struct Coeffs bmp388Coeffs;
+struct BMP388_Outputs bmp388Outputs;
+struct BMP388_Coeffs bmp388Coeffs;
+HAL_StatusTypeDef staus = HAL_OK;
 
 /* USER CODE END PV */
 
@@ -104,16 +103,20 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(1000); // wait for the I2C bus to come up [Change for HAL_I2C_IsDeviceReady when confirmed working]
-  HAL_GPIO_WritePin(GPIOA, Buz_Trig_Pin, 0);
+  staus = BMP388_Init(&hi2c1, bmp388Coeffs);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  staus = BMP388_Read(&hi2c1, bmp388Outputs, bmp388Coeffs);
+	  HAL_Delay(250);
+	  // Write pressure and temperature data over UART to PC.
   }
   /* USER CODE END 3 */
 }

@@ -9,7 +9,7 @@
 
 
 
-HAL_StatusTypeDef BMP388_Init(I2C_HandleTypeDef *I2C_Bus, struct Coeffs *calCoeffs){
+HAL_StatusTypeDef BMP388_Init(I2C_HandleTypeDef *I2C_Bus, struct BMP388_Coeffs *calCoeffs){
 	// See if the device requires a soft reset
 	// see if the device needs to come out of sleep mode
 	// read the device ID Reg 0x00 and check it = 50
@@ -45,66 +45,32 @@ HAL_StatusTypeDef BMP388_Init(I2C_HandleTypeDef *I2C_Bus, struct Coeffs *calCoef
 		if (status != HAL_OK){
 			return status;
 		}
+
+	// Could be a problem here as the I2C read command only wants a uint8_t pointer,
+	//	but unsure how that allows you to read more than one byte
 	// Read all of the coefficients
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_T1, 2, &calCoeffs->nvm_par_t1, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_T2, 2, &calCoeffs->nvm_par_t2, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_T3, 1, &calCoeffs->nvm_par_t3, 1, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P1, 2, &calCoeffs->nvm_par_p1, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P2, 2, &calCoeffs->nvm_par_p2, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P3, 1, &calCoeffs->nvm_par_p3, 1, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P4, 1, &calCoeffs->nvm_par_p4, 1, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P5, 2, &calCoeffs->nvm_par_p5, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P6, 2, &calCoeffs->nvm_par_p6, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P7, 1, &calCoeffs->nvm_par_p7, 1, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P8, 1, &calCoeffs->nvm_par_p8, 1, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P9, 2, &calCoeffs->nvm_par_p9, 2, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P10, 1, &calCoeffs->nvm_par_p10, 1, Timeout);
-		if (status != HAL_OK){
-				return status;
-		}
-	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, NVM_PAR_P11, 1, &calCoeffs->nvm_par_p11, 1, Timeout);
+		uint8_t unifiedData[21];
+
+	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, T1_REG, 1, unifiedData, 21, Timeout);
 		if (status != HAL_OK){
 				return status;
 		}
 
+	calCoeffs->nvm_par_t1 = unifiedData[(T1_REG - REG_OFFSET + 1)] << 8 | unifiedData[(T1_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_t2 = unifiedData[(T2_REG - REG_OFFSET + 1)] << 8 | unifiedData[(T2_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_t3 = unifiedData[(T3_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p1 = unifiedData[(P1_REG - REG_OFFSET + 1)] << 8 | unifiedData[(P1_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p2 = unifiedData[(P2_REG - REG_OFFSET + 1)] << 8 | unifiedData[(P2_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p3 = unifiedData[(P3_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p4 = unifiedData[(P4_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p5 = unifiedData[(P5_REG - REG_OFFSET + 1)] << 8 | unifiedData[(P5_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p6 = unifiedData[(P6_REG - REG_OFFSET + 1)] << 8 | unifiedData[(P6_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p7 = unifiedData[(P7_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p8 = unifiedData[(P8_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p9 = unifiedData[(P9_REG - REG_OFFSET + 1)] << 8 | unifiedData[(P9_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p10 = unifiedData[(P10_REG - REG_OFFSET)];
+	calCoeffs->nvm_par_p11 = unifiedData[(P11_REG - REG_OFFSET)];
 
-	// Watch out, some of these that go over e+38 might need to be doubles
 	calCoeffs->par_t1 = calCoeffs->nvm_par_t1 / pow(2, -8);
 	calCoeffs->par_t2 = calCoeffs->nvm_par_t2 / pow(2, 30);
 	calCoeffs->par_t3 = calCoeffs->nvm_par_t3 / pow(2, 48);
@@ -122,5 +88,78 @@ HAL_StatusTypeDef BMP388_Init(I2C_HandleTypeDef *I2C_Bus, struct Coeffs *calCoef
 	calCoeffs->par_p11 = calCoeffs->nvm_par_p11 / pow(2, 65);
 
 	return HAL_OK;
+}
+
+HAL_StatusTypeDef BMP388_Read(I2C_HandleTypeDef *I2C_Bus, struct BMP388_Outputs *data, struct BMP388_Coeffs *calCoeffs){
+	HAL_StatusTypeDef status = HAL_ERROR;
+	uint8_t unifiedData[6];
+	int64_t uncalibratedTemp;
+	uint64_t uncalibratedPres;
+	status = HAL_I2C_Mem_Read(I2C_Bus, BMP388_ADDRESS, T0_Data_Reg, 1, unifiedData, 6, Timeout);
+	if (status != HAL_OK){
+		return status;
+	}
+
+	uncalibratedPres = unifiedData[2] << 16 | unifiedData[1] << 8 | unifiedData[0];
+	uncalibratedTemp = unifiedData[5] << 16 | unifiedData[4] << 8 | unifiedData[3];
+
+
+	data->temprature = BMP388_Calibrate_Temprature(calCoeffs, uncalibratedTemp);
+	data->pressure = BMP388_Calibrate_Pressure(calCoeffs, uncalibratedPres);
+
+	return HAL_OK;
+}
+
+int64_t BMP388_Calibrate_Temprature(struct BMP388_Coeffs *calCoeffs, int64_t uncalibratedTemp){
+	double T1Data;
+	double T2Data;
+
+	T1Data = (double)(uncalibratedTemp - calCoeffs->par_t1);
+	T2Data = (double)(T1Data * calCoeffs->par_t2);
+	calCoeffs->temprature = T2Data + ((T1Data * T1Data) * calCoeffs->nvm_par_t3);
+
+	if (calCoeffs->temprature < -40.0f){
+		calCoeffs->temprature = -40.0f;
+	}
+	if (calCoeffs->temprature > 85.0f){
+		calCoeffs->temprature = 85.0f;
+	}
+
+	return (int64_t)calCoeffs->temprature;
+}
+
+uint64_t BMP388_Calibrate_Pressure(struct BMP388_Coeffs *calCoeffs, uint64_t uncalibratedPres){
+	double dataOut1;
+	double dataOut2;
+	double dataOut3;
+	double compensatedPressure;
+
+	dataOut1 =  calCoeffs->par_p6 * calCoeffs->temprature;
+	dataOut1 += calCoeffs->par_p7 * pow(calCoeffs->temprature, (float)2.0);
+	dataOut1 += calCoeffs->par_p8 * pow(calCoeffs->temprature, (float)3.0);
+	dataOut1 += calCoeffs->par_p5;
+
+	dataOut2 =  calCoeffs->par_p2 * calCoeffs->temprature;
+	dataOut2 += calCoeffs->par_p3 * pow(calCoeffs->temprature, (float)2.0);
+	dataOut2 += calCoeffs->par_p4 * pow(calCoeffs->temprature, (float)3.0);
+	dataOut2 += calCoeffs->par_p1;
+	dataOut2 *= uncalibratedPres;
+
+	dataOut3 =  calCoeffs->par_p10 * calCoeffs->temprature;
+	dataOut3 += calCoeffs->par_p9;
+	dataOut3 *= pow((double)uncalibratedPres, 2);
+	dataOut3 += calCoeffs->par_p11 * pow((double)uncalibratedPres, 3);
+
+	compensatedPressure = dataOut1 + dataOut2 + dataOut3;
+
+	if (compensatedPressure < 30000.0f){
+		compensatedPressure = 30000.0f;
+	}
+	if (compensatedPressure > 125000.0f){
+		compensatedPressure = 125000.0f;
+	}
+
+	return (uint64_t)compensatedPressure;
+
 }
 

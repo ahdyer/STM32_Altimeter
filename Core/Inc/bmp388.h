@@ -5,6 +5,7 @@
 #include "stm32f0xx_hal.h"
 #include "gpio_pin_names.h"
 #include "math.h"
+#include "stdlib.h"
 
 #define Timeout  		50
 
@@ -14,20 +15,23 @@
 #define ODR				(uint8_t)0x1D
 #define OSR 			(uint8_t)0x1C
 #define CONFIG			(uint8_t)0x1F
-#define NVM_PAR_T1_REG	(uint8_t)0x31
-#define NVM_PAR_T2_REG	(uint8_t)0x33
-#define NVM_PAR_T3_REG	(uint8_t)0x35
-#define NVM_PAR_P1_REG	(uint8_t)0x36
-#define NVM_PAR_P2_REG	(uint8_t)0x38
-#define NVM_PAR_P3_REG	(uint8_t)0x3A
-#define NVM_PAR_P4_REG	(uint8_t)0x3B
-#define NVM_PAR_P5_REG	(uint8_t)0x3C
-#define NVM_PAR_P6_REG	(uint8_t)0x3E
-#define NVM_PAR_P7_REG	(uint8_t)0x40
-#define NVM_PAR_P8_REG	(uint8_t)0x41
-#define NVM_PAR_P9_REG	(uint8_t)0x42
-#define NVM_PAR_P10_REG	(uint8_t)0x44
-#define NVM_PAR_P11_REG	(uint8_t)0x45
+#define REG_OFFSET  	(uint8_t)0x31
+#define T1_REG			(uint8_t)0x31
+#define T2_REG			(uint8_t)0x33
+#define T3_REG			(uint8_t)0x35
+#define P1_REG			(uint8_t)0x36
+#define P2_REG			(uint8_t)0x38
+#define P3_REG			(uint8_t)0x3A
+#define P4_REG			(uint8_t)0x3B
+#define P5_REG			(uint8_t)0x3C
+#define P6_REG			(uint8_t)0x3E
+#define P7_REG			(uint8_t)0x40
+#define P8_REG			(uint8_t)0x41
+#define P9_REG			(uint8_t)0x42
+#define P10_REG			(uint8_t)0x44
+#define P11_REG			(uint8_t)0x45
+
+#define T0_Data_Reg		(uint8_t)0x04
 
 #define NORMAL_MODE 	(uint8_t)0b110011
 #define OSR_P 			(uint8_t)0b011						// pressure over sampling = x 8
@@ -35,7 +39,7 @@
 #define IIR_COEF_3		(uint8_t)0b0010
 // IIR Filter 2
 
-struct Coeffs{
+struct BMP388_Coeffs{
 	// Temperature coefficients
 	uint16_t 	nvm_par_t1;
 	uint16_t 	nvm_par_t2;
@@ -70,7 +74,18 @@ struct Coeffs{
 	double 		par_p11;
 };
 
+struct BMP388_Outputs{
+	// Temperature coefficients
+	uint64_t pressure;
+	int64_t temprature;
+};
+
 
 // Functions
+HAL_StatusTypeDef BMP388_Read(I2C_HandleTypeDef *I2C_Bus, struct BMP388_Outputs *data, struct BMP388_Coeffs *calCoeffs);
+
+int64_t BMP388_Calibrate_Temprature(struct BMP388_Coeffs *calCoeffs, int64_t uncalibratedTemp);
+
+uint64_t BMP388_Calibrate_Pressure(struct BMP388_Coeffs *calCoeffs, uint64_t uncalibratedPres);
 
 #endif
