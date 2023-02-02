@@ -51,8 +51,22 @@ UART_HandleTypeDef huart1;
 
 struct BMP388_Outputs bmp388Outputs;
 struct BMP388_Coeffs bmp388Coeffs;
+enum Flight_States {
+	Standby 		= 1,
+	Lockout 		= 2,
+	Armed 			= 3,
+	Drouge_Fired 	= 4,
+	Main_Fired 		= 5,
+	Post_Fire 		= 6
+
+
+};
+
+
+
 HAL_StatusTypeDef staus = HAL_OK;
 
+enum flightState Flight_States;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,7 +128,29 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	  switch(flightState){
+	  	  case Standby:
+	  		  // Do stuff
+	  		  break;
+
+	  	  deafult:
+		  HAL_UART_Transmit(&huart1, "Flight State not recognised \n\r", Size, 50);
+		  	  // Print Unknown Flight State
+		  	  // Pulse buzzer every 5 seconds
+	  }
+	  // initialise state machine
+	  // ENUM Switch case for state machine
+	  // Switch case 1 Standby
+	  // Switch case 2 Lockout
+	  // Switch case 3 Armed
+	  // Switch case 4 Drogue Fired
+	  // Switch case 5 Main Fired
+	  // Switch case 6 Post Fire
 	  staus = BMP388_Read(&hi2c1, bmp388Outputs, bmp388Coeffs);
+	  // Read accelerometer
+
+
 	  HAL_Delay(250);
 	  // Write pressure and temperature data over UART to PC.
   }
